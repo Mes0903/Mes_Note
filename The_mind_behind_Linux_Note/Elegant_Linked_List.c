@@ -22,7 +22,7 @@ typedef struct List {
 Node **find(List *list, Node *target)
 {
     Node **indirect = &list->head;
-    while (*indirect != target && *indirect)
+    while (*indirect && *indirect != target)
         indirect = &(*indirect)->next;
 
     return indirect;
