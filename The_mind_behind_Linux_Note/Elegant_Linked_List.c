@@ -13,7 +13,7 @@ typedef struct List {
 } List;
 
 /**
- * @brief Find the target in the list and return it.
+ * @brief Find the target in the list and return the indirect pointer, where `*indirect == target`.
  * 
  * @param list Your list.
  * @param target The element you wanna find in the list.
