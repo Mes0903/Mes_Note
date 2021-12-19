@@ -44,7 +44,7 @@
 
 我們看一個例子：
 
-![](https://i.imgur.com/buOkGjU.png)
+![General_Purpose_Operating_Systems](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/General_Purpose_Operating_Systems.jpg?raw=true)
 
 最下面是硬體，上面則是我們寫的程式，程式大致上可以分成「和作業系統相關的」與「和作業系統無關的」，也就是圖上的 user mode 與 kernel mode，這在後面的章節會再提更多。
 
@@ -100,7 +100,7 @@ OS 主要的考量、需求有二：
 
 電腦系統有很多不同的 Hardware，我們需要把它串起來，你把主機打開來可以看見它有 bus、線，而作業系統的目的就是要控制、協調這些硬體的使用，可以看看下面這張圖：
 
-![](https://i.imgur.com/CXNZzw7.jpg)
+![Computer_System_Organization](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Organization.jpg?raw=true)
 
 簡單來說就會長上圖最下面那樣，執行程式時 instruction 是 run 在 cpu 上的，需要用到的 data 會在 memory 裡面，最後可能寫到某個 Device 上面，看要儲存還是輸出之類的，這些是 control 的部分。
 
@@ -110,7 +110,7 @@ OS 主要的考量、需求有二：
 
 這是一個 OS 基本運作的例子：
 
-![](https://i.imgur.com/rTCjl1Q.jpg)
+![Computer_System_Operations](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Computer_System_Operations.jpg?raw=true)
 
 這邊 Cpu 想對一個 I/O Device，像是 Disk 做動作，例如讀寫資料。
 
@@ -126,7 +126,7 @@ OS 主要的考量、需求有二：
 
 那麼 cpu 那邊要怎麼控制呢? 一個早期大家想到的最簡單的方法就是 Busy Waiting，完全由 cpu 來控制，這邊舉個簡單的例子：
 
-```c=
+```c
 #define OUT_CHAR 0x1000    // device data register
 #define OUT_STATUS 0x1001    // device status register
 
@@ -142,13 +142,13 @@ while ( *current_char != ‘\0’) {
 
 所以 cpu 這邊的 code
 
-```c=
+```c
 while ( *current_char != ‘\0’)
 ```
 
 是在判斷字串結束了沒，`poke` 是把值寫到 buffer，而我們在寫的時候，因為怕 buffer 還沒清空，是 busy 的狀態，所以會需要一個 while loop 去看 Status Register 的值：
 
-```c=
+```c
 while ( peek( OUT_STATUS ) != 0 );    // busy waiting
 ```
 
@@ -168,7 +168,7 @@ while ( peek( OUT_STATUS ) != 0 );    // busy waiting
 
 用這張圖來看：
 
-![](https://i.imgur.com/RCVhTS5.png)
+![Timeline](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Timeline.jpg?raw=true)
 
 假設有了 Interrupt，對於 I/O 而言就會像圖上這樣。cpu 在高電位代表他正在做他該做的事，在低電位代表他去處理別的程式的事情；而 I/O 則是反過來的，高電位代表 idle，低電位代表正在傳輸，而且花的時間可能會很長。
 
@@ -178,7 +178,7 @@ while ( peek( OUT_STATUS ) != 0 );    // busy waiting
 
 那我們來看個例子，情境是使用者要執行 `scanf`，而最終當然會到最底層去 call 到 driver：
 
-![](https://i.imgur.com/GVi83Mw.jpg)
+![Interrupt_Driven_IO](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Interrupt_Driven_IO.jpg?raw=true)
 
 一開始 cpu 會下指令給 controller，讓它開始搬資料，cpu 可能還會給個 byte 的長度，像是 100 bytes，然後 controller 搬完後再去通知 cpu。
 
@@ -206,7 +206,7 @@ while ( peek( OUT_STATUS ) != 0 );    // busy waiting
 
 那我們現在來仔細看一下他的流程，首先是 Signal：
 
-![](https://i.imgur.com/gm33dnN.png)
+![Signal](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Signal.jpg?raw=true)
 
 這整條是 memory，下面的是 user 的 Program，上面的是 OS。 
 
@@ -226,7 +226,7 @@ OS 收到的 Signal 會有一個 Signal number，然後 OS 再透過這個 numbe
 
 接下來是 Trap，一樣看一下它的流程：
 
-![](https://i.imgur.com/QtOmnrH.png)
+![Trap](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Trap.jpg?raw=true)
 
 跟前面不一樣的是，Trap 是 Program 主動需要 OS 幫忙的，所以會是一個 program 裡用了某個 system call，或是寫了某些不合法的操作，像是訪問了陣列大小以外的元素，或某個數字除以 0 了，造成 OS 需要來幫你處理後續。
 
@@ -250,7 +250,7 @@ OS 收到的 Signal 會有一個 Signal number，然後 OS 再透過這個 numbe
 
 接下來要講電腦資料讀取的基本方式，大家應該都很熟悉了，電腦資料在儲存其實是一個 Hierarchy 的架構：
 
-![](https://i.imgur.com/5d9tecz.png)
+![Storage_Device_Hierarchy](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Storage_Device_Hierarchy.png?raw=true)
 
 上面三個分別為暫存器、快取、主記憶體，而後面的則統稱為次級儲存裝置 (Secondary Storage)。 越上層的速度越快，容量越小，反之越下層的速度越慢，但容量越大，價格也比較便宜。
 
@@ -302,7 +302,7 @@ OS 收到的 Signal 會有一個 Signal number，然後 OS 再透過這個 numbe
 
 這邊看一下 Disk，他不是電子式而是機械式的，它會有讀寫的手臂，手臂上面有很多磁頭可以同時讀寫多個磁盤，磁盤有很多個，可以旋轉：
 
-![](https://i.imgur.com/MTEQUyr.png)
+![Disk_Mechanism](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Disk_Mechanism.png?raw=true)
 
 所以可以看見讀取的速度和資料在哪裡就有關係了，如果資料剛好在磁頭的對面，妳就需要轉半圈才會讀到，這樣就會有多一個 access 的時間。
 
@@ -312,7 +312,7 @@ OS 收到的 Signal 會有一個 Signal number，然後 OS 再透過這個 numbe
 
 而電腦的資料通常最終會儲存在最慢的 Device 裡面，因此我們會把資料 copy 到比較快的 Device 上面，用到的頻率越高，我們就會把它存到越上層，所以才會需要有 L1、L2、L3 的 Cache，加速 cpu 的計算：
 
-![](https://i.imgur.com/u8TQi6E.png)
+![Caching](https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Caching.png?raw=true)
 
 注意是 copy，不是搬移，如果是搬移，我們不稱它為 Cache。且 Copy 過去的資料是暫時性的資料，我們可以隨時砍掉它且不應該造成儲存資料的遺失。
 
