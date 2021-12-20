@@ -333,3 +333,69 @@ Cache 的定義是 Copy，只是個分身，不能跟本尊不同，如果不同
 因此如果今天妳的 Data 只有被一個 Process 訪問，那其實不會有什麼問題，妳再慢更新後面的資料也沒關係；但如果今天有很多個 Process 在 share 同一段 memory content，那就會有問題了，在分散式系統裡面這也是一個很重要的議題，因為還牽扯到了網路。
 
 ## Hardware Protection
+
+Protection 指的不是 Security，而是指很多程式、使用者同時在使用電腦時不會影響到對方，像是如果 A 程式 crash 了，B 程式應該也要能繼續跑；或是指某個程式只能使用某段 memory content，不能不通過 OS 就去使用到別人的 memory，諸如此類的。
+
+### Dual-Mode Operation
+
+前面在講的時候都有把 OS 與 User 分開，有些動作只有 OS 能做，那要怎麼區分 User 與 OS? 在最底層，Hardware 必須進來，因為 Hardware 是很難被修改，東西已經燒在上面的，所以 Hardware 可以做一些最基本的 Protection。
+
+而 Software 利用 Hardware support 來做一些事情，所以 Software 方面至少會有兩種 mode：
+
+1. User mode
+
+    來自於 OS 以外的 Program 都屬於 User mode
+    
+2. Monitor mode (kernel mode)
+
+    來自於 OS 的 Program，在這個 mode 下執行的程式一定是 OS 的程式碼，但可能是使用者透過 system call 來讓 OS 做的。
+
+這兩個 mode 在可能就是一個 bit(0 or 1)，我們前面提過，OS 要做任何事都是透過 system call，而 system call 需要透過 Interrupt。
+
+<center><img src="https://i.imgur.com/Ibo86Cr.png"></center><br>
+
+平常某個 Program 在執行時是在 User mode 底下，而當它送 Interrupt 出來後那個 bit 就會 flip，進到 kernel mode，因為只要一發 Interrupt 就代表你 call 了 system call，而 system call 就會執行 OS 的程式。
+
+因此 Interrupt 還有一個很重要的意義就是 Program 會從 User mode 切換到 Kernel mode，等到 OS 做完，return 到 User Program 時，那個 bit 才會 flip 回來。
+
+### Privileged instructions
+
+那我們就可以透過這個機制來保護電腦，今天我們要做任何事都要透過 instruction，如果某個 instruction 會影響到其他人，我們就會要求他一定要透過 OS，這個是 instruction 在設計的時候就寫死的，也就是它有一個 set 叫做 Privileged instructions。
+
+所謂的 Privileged instructions 必須在 kernel mode 才能執行，你 User 也可以送這個 instruction 給 cpu，但 cpu 在執行的時候會去 check 前面提到的那個 bit，而當 cpu 看到你現在那個 bit 代表的是 User mode，它就不會繼續執行，直接丟一個 error 出來讓 OS 處理。
+
+所以 User 需要透過 system call 才能讓 OS 幫忙做事，這樣 OS 就可以完全 control 哪些動作能做哪寫不能。
+
+### I/O Protection
+
+那接下來我們就要看怎麼去保護電腦，首先是 I/O 方面，而與 I/O 有關的 instruction <span class = "yellow">全都都需要保護</span>，因為 I/O 的資源是 share 的，像是螢幕輸出，都時同一個螢幕，硬碟儲存也是同一顆硬碟。 
+
+如果沒有限制需要 kernel mode 才能進行 I/O，那別人就可以亂更改你的 Device，整個系統就會亂掉。
+
+但這樣其實還是有一些漏洞，沒法繞過 I/O，但還是可以繞 memory，像是透過合法的 I/O 流程去修改原本應該要執行的函式，讓它執行我們想要做的事這類的，有在打 CTF 的應該很熟。
+
+### Memory Protection
+
+所以更重要的還是保護 memory，首先當然 Interrupt vector 不能被改，然後就是別人的 Data 不能被修改這類的。
+
+保護的方式其實很簡單，就是紀錄兩個 register，這樣就有一個區間給 memory 使用，超過這個區間的 memory 就不屬於這個 Process。
+
+邏輯上這是一個連續空間，所以我們需要的兩個 register 分別為 Base register 與 Limit register，前者記錄開始的位置，後者記錄 memory 區間有多長。
+
+檢查的流程大概就長這樣：
+
+<center><img src = "https://i.imgur.com/4cN2jpX.png"></center>
+
+先去檢查存取的 address 有沒有大於 base address，再去看有沒有小於 base address + limit，都通過慈可以存取 memory。
+
+要注意的是 Base register 與 Limit register 都是 register，裡面存的都是值，如果要修改這個值，這個 instruction 需要是 Privileged instructions，不然這個機制也沒用了。
+
+### CPU Protection
+
+cpu 的保護主要是要阻止一個程式可以霸佔 cpu，不讓別的程式執行，舉個例子，當我們有一個 Process 裡面有無限迴圈，我們一樣可以把它 ctrl+c 掉，不會 cpu 直接被霸佔，電腦整個當掉。
+
+而主要的方法叫做 Time sharing，會有一個 Timer 來計時，每過一段時間就會丟一個 Interrupt 出來，把原本的 Process 打斷，執行 OS 的 Scheduler，這樣每過一段時間控制權就會回到 OS，OS 再決定是不是要繼續剛剛那個 Process。
+
+而那個 Load time 到 register 的 instruction 也是 privileged instruction，只有 OS 可以調整 Timer 數的時間。
+
+第一章就到這裡，下一章會開始進到 OS Structure。
