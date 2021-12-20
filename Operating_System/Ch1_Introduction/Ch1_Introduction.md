@@ -352,7 +352,7 @@ Protection 指的不是 Security，而是指很多程式、使用者同時在使
 
 這兩個 mode 在可能就是一個 bit(0 or 1)，我們前面提過，OS 要做任何事都是透過 system call，而 system call 需要透過 Interrupt。
 
-<center><img src="https://i.imgur.com/Ibo86Cr.png"></center><br>
+<center><img src="https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/Dual_mode.png?raw=true"></center><br>
 
 平常某個 Program 在執行時是在 User mode 底下，而當它送 Interrupt 出來後那個 bit 就會 flip，進到 kernel mode，因為只要一發 Interrupt 就代表你 call 了 system call，而 system call 就會執行 OS 的程式。
 
@@ -384,7 +384,7 @@ Protection 指的不是 Security，而是指很多程式、使用者同時在使
 
 檢查的流程大概就長這樣：
 
-<center><img src = "https://i.imgur.com/4cN2jpX.png"></center>
+<center><img src = "https://github.com/Mes0903/Mes_Note/blob/main/Operating_System/Ch1_Introduction/Image/memory_protection.png?raw=true"></center>
 
 先去檢查存取的 address 有沒有大於 base address，再去看有沒有小於 base address + limit，都通過慈可以存取 memory。
 
