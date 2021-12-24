@@ -64,7 +64,7 @@ void List::erase(Node *target)
         *indirect = target->next;
 }
 
-void List::insert_before(const int target, int data)
+void List::insert_before(const int target, const int data)
 {
     Node **indirect = _find(target);
     *indirect = new Node(data, *indirect);
