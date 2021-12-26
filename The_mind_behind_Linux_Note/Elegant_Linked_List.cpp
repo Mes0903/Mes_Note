@@ -60,8 +60,11 @@ void List::erase(Node *target)
 {
     Node **indirect = _find(target);
 
-    if (*indirect)
+    if (*indirect) {
+        Node *tmp = *indirect;
         *indirect = target->next;
+        delete tmp;
+    }
 }
 
 void List::insert_before(const int target, const int data)
