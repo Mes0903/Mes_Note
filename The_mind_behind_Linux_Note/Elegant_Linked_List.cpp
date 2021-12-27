@@ -1,109 +1,122 @@
 #include <iostream>
-
+namespace detail {
+  struct Node {
+    int data;
+    Node *next;
+    Node()
+        : data(0), next(nullptr) {}
+    Node(int _d, Node *_next = nullptr)
+        : data(_d), next(_next) {}
+    ~Node() { puts("~Node"); }
+  };
+}    // namespace detail
 class List {
-    struct Node {
-        int data;
-        Node *next;
-        Node()
-            : data(0), next(nullptr) {}
-        Node(int _d, Node *_next = nullptr)
-            : data(_d), next(_next) {}
-        ~Node() { puts("~Node"); }
-    };
+  using Node = detail::Node;
+  Node **_find(const int target);
+  Node **_find(Node *target);
 
-    Node **_find(const int target);
-    Node **_find(Node *target);
+public:
+  Node *head;
 
-  public:
-    Node *head;
+  void erase(const int target);
+  void erase(Node *target);
+  void insert_before(const int target, const int data);
+  void insert_before(Node *target, const int data);
+  void output();
 
-    void erase(const int target);
-    void erase(Node *target);
-    void insert_before(const int target, const int data);
-    void insert_before(Node *target, const int data);
-    void output();
-
-    List()
-        : head(nullptr) {}
+  List()
+      : head(nullptr) {}
+  ~List();
 };
 
 List::Node **List::_find(const int target)
 {
-    Node **indirect = &head;
-    while (*indirect && (*indirect)->data != target)
-        indirect = &(*indirect)->next;
+  Node **indirect = &head;
+  while (*indirect && (*indirect)->data != target)
+    indirect = &(*indirect)->next;
 
-    return indirect;
+  return indirect;
 }
 
 List::Node **List::_find(Node *target)
 {
-    Node **indirect = &head;
-    while (*indirect && *indirect != target)
-        indirect = &(*indirect)->next;
+  Node **indirect = &head;
+  while (*indirect && *indirect != target)
+    indirect = &(*indirect)->next;
 
-    return indirect;
+  return indirect;
 }
 
 void List::erase(const int target)
 {
-    Node **indirect = _find(target);
+  Node **indirect = _find(target);
 
-    if (*indirect) {
-        Node *tmp = *indirect;
-        *indirect = tmp->next;
-        delete tmp;
-    }
+  if (*indirect) {
+    Node *tmp = *indirect;
+    *indirect = tmp->next;
+    delete tmp;
+  }
 }
 
 void List::erase(Node *target)
 {
-    Node **indirect = _find(target);
+  Node **indirect = _find(target);
 
-    if (*indirect) {
-        Node *tmp = *indirect;
-        *indirect = target->next;
-        delete tmp;
-    }
+  if (*indirect) {
+    Node *tmp = *indirect;
+    *indirect = target->next;
+    delete tmp;
+  }
 }
 
 void List::insert_before(const int target, const int data)
 {
-    Node **indirect = _find(target);
-    *indirect = new Node(data, *indirect);
+  Node **indirect = _find(target);
+  *indirect = new Node(data, *indirect);
 }
 
 void List::insert_before(Node *target, const int data)
 {
-    Node **indirect = _find(target);
-    *indirect = new Node(data, *indirect);
+  Node **indirect = _find(target);
+  *indirect = new Node(data, *indirect);
 }
 
 void List::output()
 {
-    Node **indirect = &head;
+  Node **indirect = &head;
 
-    while (*indirect) {
-        std::cout << (*indirect)->data << " ";
-        indirect = &(*indirect)->next;
-    }
-    std::cout << '\n';
+  while (*indirect) {
+    std::cout << (*indirect)->data << " ";
+    indirect = &(*indirect)->next;
+  }
+  std::cout << '\n';
+}
+
+List::~List()
+{
+  Node **indirect = &head;
+  Node *tmp = nullptr;
+  while (*indirect) {
+    tmp = *indirect;
+    *indirect = (*indirect)->next;
+    delete tmp;
+  }
 }
 
 int main()
 {
-    List list;
+  List list;
 
-    list.erase(5);
+  list.erase(5);
 
-    for (std::size_t i{}; i < 20; ++i)
-        list.insert_before(list.head, i);
+  for (std::size_t i{}; i < 20; ++i)
+    list.insert_before(list.head, i);
 
-    list.output();
+  list.output();
 
-    list.erase(5);
-    list.erase(5);
-    list.erase(list.head);
+  list.erase(5);
+  list.erase(5);
+  list.erase(list.head);
 
-    list.output();
+  list.output();
 }
