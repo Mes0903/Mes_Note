@@ -1,4 +1,5 @@
 #include <iostream>
+
 namespace detail {
   struct Node {
     int data;
@@ -10,6 +11,7 @@ namespace detail {
     ~Node() { puts("~Node"); }
   };
 }    // namespace detail
+
 class List {
   using Node = detail::Node;
   Node **_find(const int target);
