@@ -7,7 +7,9 @@
 
 Linus Torvalds 在 2016 年的 [TED interview](https://www.ted.com/talks/linus_torvalds_the_mind_behind_linux) 裡談到了他自己的工作模式，性格與 Linux 和 Git 出現時的一些心路歷程。
 
-於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，主要參考了 [felipec](https://github.com/felipec/linked-list-good-taste) 的 github 與 [Jserv 老師的解釋](https://hackmd.io/@sysprog/c-linked-list)。
+於 14:10 分時他提到了 coding 方面的 「good taste」 是什麼，並舉了一個 singly-linked list 的例子，由於在社團裡看見有人說看不懂，加上自己也想做一下筆記，因此就寫了這篇，並補了一些說明及例子，實作上主要參考了 [felipec](https://github.com/felipec/linked-list-good-taste) 的 github 與 [Jserv 老師的解釋](https://hackmd.io/@sysprog/c-linked-list)。
+
+若文章內容有謬誤，或您有什麼建議，都很歡迎私訊告訴我~
 
 ## 概念
 
@@ -16,7 +18,7 @@ Linus Torvalds 舉的例子是移除一筆在 list 裡面的資料，一般的�
 如果要移除的是第一筆資料，那就需要把指標指向第一個 Node；而如果是要移除中間的資料，則須要把指標指向目標的前一個 Node。
 
 Talk 裡面給的 Pseudo Code 長這樣：
-```cpp
+```cpp=
 remove_list_entry(entry)
 {
     prev = NULL;
@@ -42,7 +44,7 @@ remove_list_entry(entry)
 而 Linus Torvalds 的想法則換了一個角度，通過指標的指標來操作，如此一來 branch 就消失了。
 
 Talk 裡面給的 Pseudo Code 長這樣：
-```cpp
+```cpp=
 remove_list_entry(entry)
 {
     // The "indirect" pointer points to the
@@ -60,6 +62,7 @@ remove_list_entry(entry)
 
     *indirect = entry->next;
 }
+
 ```
 
 如果 Pseudo Code 有點難看，那你可以先跳過，往後看解釋和簡單的實作。
@@ -76,13 +79,13 @@ Linus Torvalds 在 15:25 時說
 
 然後會有一個 branch 判斷 `prev` 是否為空指標，如果是空指標就代表 target 是 list 的 head，因此需要把 list 的 head 指向下一個元素；若非空就把前一個元素的 next Node 設為目前的下一個 Node：
 
-![](https://i.imgur.com/0EHTGG0.png)
+![normal pointer](https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Image/normal.png?raw=true)
 
 而 Linus Torvalds 的想法則是拿一個指標指向「Node 裡面指向下一個 Node 的指標」，以「要更新的位址」為思考點來操作。
 
 有一個指標的指標 `indirect`，一開始指向 head，之後一樣走訪 list，解指標看是不是我們要的 target，如果 `*indirect` 就是我們要刪除的元素，代表 `indirect` 現在指向前一個 Node 裡面的 next pointer，因此把 `*indirect` 設為 target 的下一個 Node 就完成整個操作了：
 
-![](https://i.imgur.com/OopvzWM.png)
+![inditect pointer](https://github.com/Mes0903/Mes_Note/blob/main/The_mind_behind_Linux_Note/Image/indirect.png?raw=true)
 
 ## 簡單的實作
 
@@ -228,6 +231,10 @@ int main()
 
 整體的設計概念都一樣，但我有做一些小調整，讓使用的時候可以直接傳 `data` 進 user API，還有多處理了記憶體釋放的問題。
 
+# 延伸閱讀
 
+看到這裡後建議可以去看一下 Jserv 老師提到的 [Merge Two Sorted Lists](https://hackmd.io/@sysprog/c-linked-list?fbclid=IwAR2dELWav-gGwBZHOnXBDnpywQQhEUtMcYdLPRKum99rdiz8QsVqrhYpKCM#%E6%A1%88%E4%BE%8B%E6%8E%A2%E8%A8%8E-LeetCode-21-Merge-Two-Sorted-Lists) 這個案例，題目連結在這裡：[LeetCode 21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
 
-{%hackmd aPqG0f7uS3CSdeXvHSYQKQ %}
+題目是給兩個已經排序好的 linked list，然後把他們 merge 起來，元素的順序要一樣由小到大或由大到小，實作上可以利用 indirect pointer 來省一些空間。
+
+而如果你還有接著讀老師文章後方 [LeetCode 23. Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/) 的例子，那可以去看一下 Lambert Wu 寫的 [Merge Sort 與它的變化](https://hackmd.io/@nk8mC3QoR3yxmNf5DvbQXw/modified-merge-sort)，裡面有多做一些解釋且有測試不同方法的速度。
