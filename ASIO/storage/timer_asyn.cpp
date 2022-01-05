@@ -10,13 +10,17 @@ int main()
 {
   boost::asio::io_context io;
 
-  boost::asio::steady_timer t(io, boost::asio::chrono::seconds(5));
+  boost::asio::steady_timer t(io, boost::asio::chrono::seconds(1));
+  boost::asio::steady_timer t2(io, boost::asio::chrono::seconds(2));
+
   std::cout << "test1\n";
   t.async_wait(&print);
+  t2.async_wait(&print);
+
   std::cout << "test2\n";
   io.run();
-  std::cout << "test3\n";
 
+  std::cout << "test3\n";
 
   return 0;
 }
